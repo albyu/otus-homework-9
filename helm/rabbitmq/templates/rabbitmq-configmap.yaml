@@ -1,0 +1,74 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "rabbitmq.fullname" . }}-configmap
+data:
+  rabbitmq-definitions.json: |-
+    {
+      "vhosts": [
+        {
+          "name": "/"
+        }
+      ],
+      "exchanges": [
+        {
+          "name": "{{ .Values.rabbitmq.account.exchangeName }}",
+          "type": "direct",
+          "vhost": "/",
+          "durable": true,
+          "auto_delete": false
+
+        },
+        {
+          "name": "{{ .Values.rabbitmq.notification.exchangeName }}",
+          "type": "direct",
+          "vhost": "/",
+          "durable": true,
+          "auto_delete": false
+        }
+
+      ],
+      "queues": [
+        {
+          "name": "{{ .Values.rabbitmq.account.queueName }}",
+          "vhost": "/",
+          "durable": true,
+          "auto_delete": false
+        },
+        {
+          "name": "{{ .Values.rabbitmq.notification.accQueueName }}",
+          "vhost": "/",
+          "durable": true,
+          "auto_delete": false
+        },
+        {
+          "name": "{{ .Values.rabbitmq.notification.authQueueName }}",
+          "vhost": "/",
+          "durable": true,
+          "auto_delete": false
+        }
+      ],
+      "bindings": [
+        {
+          "source": "{{ .Values.rabbitmq.account.exchangeName }}",
+          "vhost": "/",
+          "destination": "{{ .Values.rabbitmq.account.queueName }}",
+          "destination_type": "queue",
+          "routing_key": ""
+        },
+        {
+          "source": "{{ .Values.rabbitmq.notification.exchangeName }}",
+          "vhost": "/",
+          "destination": "{{ .Values.rabbitmq.notification.accQueueName }}",
+          "destination_type": "queue",
+          "routing_key": "account"
+        },
+        {
+          "source": "{{ .Values.rabbitmq.notification.exchangeName }}",
+          "vhost": "/",
+          "destination": "{{ .Values.rabbitmq.notification.authQueueName }}",
+          "destination_type": "queue",
+          "routing_key": "auth"
+        }          
+      ]
+    }

@@ -1,0 +1,15 @@
+rabbitmq:
+  enabled: true
+  username: rabbitadmin
+  password: rabbitpassword
+  port: 5672
+  uiPort: 15672   
+  account:
+    queueName: reqaccount
+    exchangeName: reqaccountex
+  notification:
+    accQueueName: reqnotificationacc
+    authQueueName: reqnotificationauth
+    exchangeName: reqnotificationex
+
+    

@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: ConfigMap
+metadata: 
+  name: {{ include "notification.fullname" . }}-configmap
+data:
+  application.yml: |
+    server:
+      port: {{.Values.notification.service.port}}
+      shutdown: graceful
+    spring:
+      rabbitmq:
+        host: {{.Values.rabbitmq.service}}
+        port: {{.Values.rabbitmq.port}}
+        username: ${RABBITMQ_USER}
+        password: ${RABBITMQ_PASSWORD}
+      datasource:
+        url: ${POSTGRES_URL}
+        username: ${POSTGRES_APP_USER}
+        password: ${POSTGRES_APP_PASSWORD}
+        driver-class-name: org.postgresql.Driver
+      jpa:
+        hibernate:
+          ddl-auto: update
+      mvc:
+        pathmatch:
+          matching-strategy: ant_path_matcher
+    springfox:
+      documentation:
+        swagger-ui:
+          base-url: /notification-doc
+        swagger:
+          v2:
+            path: /notification-doc/v2/api-docs
+    management:
+      endpoint:
+        metrics:
+          enabled: true
+      endpoints:
+        web:
+          exposure:
+            include: health, info, prometheus
+      metrics:
+        export:
+          prometheus:
+            enabled: true  
+    application:
+      role: {{.Values.notification.name}}
+      auth-url: {{.Values.hosts.authurl}}
+      rabbitmq:
+        notification:
+          accQueueName: {{.Values.rabbitmq.notification.accQueueName}} 
+          authQueueName: {{.Values.rabbitmq.notification.authQueueName}}
+          

@@ -1,0 +1,33 @@
+notification:
+  name: notification
+  postgres:
+    appUsername: otususer
+    appPassword: otususer
+    appDatabase: otusdb
+    appDbUrl: jdbc:postgresql://postgres-service:5432/notification_db
+  rabbitmq:
+    username: rabbitadmin
+    password: rabbitpassword
+  service:
+    port: &noteServicePort 8080
+    type: ClusterIP
+  ingress:
+    enabled: true
+    tls: false
+    rules:
+    - host: arch.homework
+      http:
+        paths:
+        - path: /aboldyrev/notification($|/)(.*)
+          service:
+            port: *noteServicePort
+rabbitmq:
+  service: rabbitmq
+  port: 5672
+#
+  notification:
+    accQueueName: reqnotificationacc
+    authQueueName: reqnotificationauth   
+hosts:
+  authurl: 'http://auth-service:8080/auth'
+

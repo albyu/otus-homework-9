@@ -1,0 +1,39 @@
+account:
+  name: account
+  postgres:
+    appUsername: otususer
+    appPassword: otususer
+    appDatabase: otusdb
+    appDbUrl: jdbc:postgresql://postgres-service:5432/account_db
+  rabbitmq:
+    username: rabbitadmin
+    password: rabbitpassword
+  service:
+    port: &accServicePort 8080
+    type: ClusterIP
+  ingress:
+    enabled: true
+    tls: false
+    rules:
+    - host: arch.homework
+      http:
+        paths:
+        - path: /aboldyrev/account($|/)(.*)
+          service:
+            port: *accServicePort
+        #- path: /get
+        #  service:
+        #    port: *accServicePort
+        #- path: /credit
+        #  service:
+        #    port: *accServicePort
+hosts:
+  authurl: http://auth-service:8080/auth
+rabbitmq:
+  service: rabbitmq
+  port: 5672
+#
+  account:
+    queueName: reqaccount
+  notification:
+    exchangeName: reqnotificationex
