@@ -1,0 +1,8 @@
+NAME                                       READY   STATUS    RESTARTS        AGE
+account-deployment-76d59df699-p7t9w        1/1     Running   0               25h
+auth-deployment-69f86cd4d8-9jh9w           1/1     Running   0               25h
+notification-deployment-5796d7c6db-kkqtm   1/1     Running   0               25h
+order-deployment-85b6f99ff5-7d56h          1/1     Running   0               25h
+postgres-deployment-6f9cc64b84-tpwv4       1/1     Running   0               25h
+rabbitmq-6c855dccdc-lcpnc                  1/1     Running   0               25h
+test-pod                                   1/1     Running   186 (20m ago)   27d

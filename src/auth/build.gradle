@@ -32,6 +32,8 @@ dependencies {
     implementation 'org.postgresql:postgresql:42.6.0'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
     implementation 'org.springframework.boot:spring-boot-starter-amqp'
 
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.3'
@@ -50,7 +52,7 @@ dependencies {
 
 
 bootJar {
-    archiveBaseName = 'otus-homework-9-auth'
-    archiveFileName = 'otus-homework-9-auth.jar'
+    archiveBaseName = 'otus-homework-d-auth'
+    archiveFileName = 'otus-homework-d-auth.jar'
 }
 

@@ -12,38 +12,47 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.boldyrev.otus.exception.*;
-import ru.boldyrev.otus.model.entity.User;
 import ru.boldyrev.otus.model.transfer.TransportableUser;
+import ru.boldyrev.otus.service.RedisService;
 import ru.boldyrev.otus.service.UserService;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @Slf4j
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 @Api(tags = "Аутентификация/авторизация клиента")
 public class AuthController {
-    private Map<String, TransportableUser> SESSIONS = new HashMap<>();
+    //private Map<String, TransportableUser> SESSIONS = new HashMap<>();
 
     private final UserService userService;
 
-    private String createSession(TransportableUser u) {
+    private final RedisService redisService;
+
+    private String createSession(TransportableUser u) throws ValidationErrorException {
         String sessionId = generateSessionId(40);
-        SESSIONS.put(sessionId, u);
+        redisService.saveSession(sessionId, u);
+        //SESSIONS.put(sessionId, u);
         return sessionId;
     }
 
-    private TransportableUser deleteSession(String sessionId){
-        return SESSIONS.remove(sessionId);
+    private void deleteSession(String sessionId) throws ValidationErrorException {
+        //SESSIONS.remove(sessionId);
+        redisService.deleteSession(sessionId);
     }
 
-    private TransportableUser getSessionUser(String sessionId) throws NotAuthorizedException {
-        if (sessionId != null && SESSIONS.containsKey(sessionId)) {
-            TransportableUser user = SESSIONS.get(sessionId);
-            return user;
-        } else throw new NotAuthorizedException("User not authorized");
+    private TransportableUser getSessionUser(String sessionId) throws NotAuthorizedException, ValidationErrorException {
+        //if (sessionId != null && SESSIONS.containsKey(sessionId)) {
+        if (sessionId != null) {
+            Optional<TransportableUser> tUser = redisService.getTransportableUserBySessionId(sessionId);
+            if (tUser.isPresent()) {
+                return tUser.get();
+            }
+        }
+        //} else throw new NotAuthorizedException("User not authorized");
+        throw new NotAuthorizedException("User not authorized");
     }
 
     private HttpHeaders convertUserToHeaders(TransportableUser tUser) {
@@ -104,7 +113,7 @@ public class AuthController {
 
     @ApiOperation(value = "Завершение пользовательской сессии")
     @RequestMapping(value = "/logout", method = {RequestMethod.GET, RequestMethod.POST})
-    public ResponseEntity<Map<String, String>> logout(HttpServletResponse response, @CookieValue(value = "session_id", defaultValue = "") String sessionId) {
+    public ResponseEntity<Map<String, String>> logout(HttpServletResponse response, @CookieValue(value = "session_id", defaultValue = "") String sessionId) throws ValidationErrorException {
 
         deleteSession(sessionId);
 
@@ -119,8 +128,8 @@ public class AuthController {
             @ApiResponse(code = 200, message = "Success", response = TransportableUser.class),
             @ApiResponse(code = 401, message = "User not authorized")
     })
-    @GetMapping(value = "/auth")
-    public ResponseEntity<TransportableUser> auth(@CookieValue(name = "session_id", required = false) String sessionId) throws NotAuthorizedException {
+    @GetMapping(value = "/check")
+    public ResponseEntity<TransportableUser> auth(@CookieValue(name = "session_id", required = false) String sessionId) throws NotAuthorizedException, ValidationErrorException {
         TransportableUser tUser = getSessionUser(sessionId);
         HttpHeaders headers = convertUserToHeaders(tUser);
         return ResponseEntity.ok().headers(headers).body(tUser);

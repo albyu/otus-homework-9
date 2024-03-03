@@ -1,7 +1,6 @@
 package ru.boldyrev.otus.service;
 
 import lombok.RequiredArgsConstructor;
-import net.bytebuddy.dynamic.DynamicType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.boldyrev.otus.exception.ConflictException;
@@ -123,7 +122,7 @@ public class OrderService {
                         .filter(item -> Objects.equals(item.getId(), tItemId))
                         .findFirst().orElse(null);
             }
-            
+
             if (existingItem != null) {
 
                 /*Есть такой элемент - апдейтим его*/

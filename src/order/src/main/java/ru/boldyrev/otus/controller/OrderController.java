@@ -115,11 +115,11 @@ public class OrderController {
             @ApiResponse(code = 500, message = "Authentication error")
     })
     @GetMapping(value = "/get", produces = "application/json")
-    public ResponseEntity<Order> orderGet(@RequestParam(name = "orderId") String orderId, @CookieValue(value = "session_id", required = false) String sessionId) throws NotFoundException, NotAuthorizedException, ConflictException, AuthErrorException {
+    public ResponseEntity<TransportableOrder> orderGet(@RequestParam(name = "orderId") String orderId, @CookieValue(value = "session_id", required = false) String sessionId) throws NotFoundException, NotAuthorizedException, ConflictException, AuthErrorException {
         Order order = orderService.get(orderId);
         checkAuthService.checkAuth(sessionId, order.getUsername());
-
-        return ResponseEntity.status(HttpStatus.OK).body(order);
+        TransportableOrder tOrder = new TransportableOrder(order);
+        return ResponseEntity.status(HttpStatus.OK).body(tOrder);
     }
 
     @ExceptionHandler(ConflictException.class)
